@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "./ERC721URIStorage.sol";
+import "./Ownable.sol";
+import "./Counters.sol";
 
 contract t3rm is ERC721URIStorage, Ownable {
   /**
@@ -25,6 +25,16 @@ contract t3rm is ERC721URIStorage, Ownable {
    * Mapping of command hash to tokenID.
    */
    mapping(bytes32 => uint) private _commands;
+
+   /**
+   * Mapping of tokenID to command hash.
+   */
+   mapping(uint => string) private _tokens;
+
+   /**
+   * Mapping of tokenID to creator.
+   */
+   mapping(uint => address) private _creators;
 
   /**
    * Mapping of command to frozen status.
@@ -109,8 +119,8 @@ contract t3rm is ERC721URIStorage, Ownable {
     // Reserved: disconnect
     _commands[0x017399084a6301db582204dd3505f7ead52eb83de2b3c608d8503256263026cf] = type(uint256).max;
 
-    // Reserved: help
-    _commands[0xb2c80d57257e1d0beff74263cff0b9289e7baef33d9df9bfb36185ffaf713e5a] = type(uint256).max;
+    // Reserved: info
+    _commands[0x3820cab827512459062f4d6dd584c03d5f2ec29517c1c68c886f18f041fc4fc7] = type(uint256).max;
 
     // Reserved: list
     _commands[0xbe8e25a9981f15070e47df9c1c85829f53ccec91a1340eac095113ab184fae5f] = type(uint256).max;
@@ -128,10 +138,10 @@ contract t3rm is ERC721URIStorage, Ownable {
   /**
    * Command Hash helper.
    *
-   * Accepts alphanumeric characters, hyphens, periods, and underscores.
-   * Returns a keccak256 hash of the lowercase command.
+   * Accepts lowercase letters, numbers, hyphens, periods, and underscores.
+   * Returns a keccak256 hash.
    */
-  function _commandHash(string memory str) private pure returns (bytes32){
+  function _commandHash(string memory str) private pure returns (bytes32) {
     bytes memory b = bytes(str);
 
     for (uint i; i<b.length; i++){
@@ -139,7 +149,6 @@ contract t3rm is ERC721URIStorage, Ownable {
 
       require (
         (char >= 0x30 && char <= 0x39) || //0-9
-        (char >= 0x41 && char <= 0x5A) || //A-Z
         (char >= 0x61 && char <= 0x7A) || //a-z
         (char == 0x2D) || //-
         (char == 0x2E) || //.
@@ -147,18 +156,7 @@ contract t3rm is ERC721URIStorage, Ownable {
       , "Command contains invalid characters.");
     }
 
-    bytes memory bLower = new bytes(b.length);
-
-    for (uint i = 0; i < b.length; i++) {
-      if ((uint8(b[i]) >= 65) && (uint8(b[i]) <= 90)) {
-        // Uppercase character
-        bLower[i] = bytes1(uint8(b[i]) + 32);
-      } else {
-        bLower[i] = b[i];
-      }
-    }
-
-    return keccak256(abi.encode(string(bLower)));
+    return keccak256(abi.encode(string(b)));
   }
 
   /**
@@ -196,6 +194,41 @@ contract t3rm is ERC721URIStorage, Ownable {
    */
   function totalSupply() public view returns (uint) {
     return _tokenIDs.current();
+  }
+
+  /**
+   * Get token ID of command.
+   *
+   * Returns the token ID.
+   */
+  function token(string memory _command) public view returns (uint) {
+    bytes32 _cmd = _commandHash(_command);
+    uint tokedID = _commands[_cmd];
+    require(tokedID > 0, "Command not found.");
+
+    return tokedID;
+  }
+
+  /**
+   * Get the command string for a tokenID.
+   *
+   * Returns the registered command.
+   */
+  function command(uint _tokenId) public view returns (string memory) {
+    require(_tokenId <= _tokenIDs.current(), "Token doesn't exist.");
+
+    return _tokens[_tokenId];
+  }
+
+  /**
+   * Get the creator of a token.
+   *
+   * Returns the creator's address.
+   */
+  function creator(uint _tokenId) public view returns (address) {
+    require(_tokenId <= _tokenIDs.current(), "Token doesn't exist.");
+
+    return _creators[_tokenId];
   }
 
   /**
@@ -284,6 +317,8 @@ contract t3rm is ERC721URIStorage, Ownable {
     _mint(_receiver, tokenId);
     _setTokenURI(tokenId, _tokenURI);
     _commands[_cmd] = tokenId;
+    _tokens[tokenId] = _command;
+    _creators[tokenId] = msg.sender;
 
     return tokenId;
   }
