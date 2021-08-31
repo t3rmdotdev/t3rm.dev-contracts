@@ -212,30 +212,11 @@
     "inputs":[
       {
         "internalType":"string",
-        "name":"_command",
+        "name":"_package",
         "type":"string"
       }
     ],
     "name":"code",
-    "outputs":[
-      {
-        "internalType":"string",
-        "name":"",
-        "type":"string"
-      }
-    ],
-    "stateMutability":"view",
-    "type":"function"
-  },
-  {
-    "inputs":[
-      {
-        "internalType":"uint256",
-        "name":"_tokenId",
-        "type":"uint256"
-      }
-    ],
-    "name":"command",
     "outputs":[
       {
         "internalType":"string",
@@ -284,7 +265,7 @@
     "inputs":[
       {
         "internalType":"string",
-        "name":"_command",
+        "name":"_package",
         "type":"string"
       }
     ],
@@ -299,7 +280,7 @@
     "inputs":[
       {
         "internalType":"string",
-        "name":"_command",
+        "name":"_package",
         "type":"string"
       }
     ],
@@ -376,7 +357,7 @@
     "inputs":[
       {
         "internalType":"string",
-        "name":"_command",
+        "name":"_package",
         "type":"string"
       },
       {
@@ -435,7 +416,7 @@
       },
       {
         "internalType":"string",
-        "name":"_command",
+        "name":"_package",
         "type":"string"
       },
       {
@@ -499,6 +480,25 @@
         "internalType":"address",
         "name":"",
         "type":"address"
+      }
+    ],
+    "stateMutability":"view",
+    "type":"function"
+  },
+  {
+    "inputs":[
+      {
+        "internalType":"uint256",
+        "name":"_tokenId",
+        "type":"uint256"
+      }
+    ],
+    "name":"package",
+    "outputs":[
+      {
+        "internalType":"string",
+        "name":"",
+        "type":"string"
       }
     ],
     "stateMutability":"view",
@@ -628,7 +628,7 @@
     "inputs":[
       {
         "internalType":"string",
-        "name":"_command",
+        "name":"_package",
         "type":"string"
       }
     ],
@@ -721,7 +721,7 @@
     "inputs":[
       {
         "internalType":"string",
-        "name":"_command",
+        "name":"_package",
         "type":"string"
       },
       {
